@@ -117,17 +117,17 @@ if section == "Game Behavior KPIs":
     st.subheader("🔹 Key Metrics")
     col1, col2, col3, col4, col5, col6 = st.columns(6)
     with col1:
-        st.metric("Total Achievements", data['AchievementsUnlocked'].sum())
+        st.metric("Avg Achievements per Player", f"{data['AchievementsUnlocked'].mean():.2f}")
     with col2:
         st.metric("Avg Playtime per Genre (hrs)", f"{data.groupby('GameGenre')['PlayTimeHours'].mean().mean():.2f}")
     with col3:
-        st.metric("Total Sessions by Engagement Level", data.groupby('EngagementLevel')['SessionsPerWeek'].sum().sum())
-    with col4:
         st.metric("Avg Sessions per Player", f"{data['SessionsPerWeek'].mean():.2f}")
-    with col5:
+    with col4:
         st.metric("Avg Session Duration (mins)", f"{data['AvgSessionDurationMinutes'].mean():.1f}")
-    with col6:
+    with col5:
         st.metric("Percentage of Players Unlocking Achievements", f"{(data['AchievementsUnlocked'] > 0).mean() * 100:.1f}%")
+    with col6:
+        st.metric("Avg Player Level", f"{data['PlayerLevel'].mean():.1f}")
 
     # Visualizations
     st.subheader("📊 Visual Analysis")
