@@ -1,192 +1,170 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import seaborn as sns
 import matplotlib.pyplot as plt
+import seaborn as sns
 
-# Page config
-st.set_page_config(page_title="Online Gaming Analysis", layout="wide")
+# Page Config
+st.set_page_config(page_title="Online Gaming Analytics", layout="wide")
 
 # Load the dataset
 data = pd.read_csv('online_gaming_behavior_dataset.csv')
 
-# Sidebar: Select Sections
-with st.sidebar:
-    st.title("🎮 Choose Section")
-    
-    section = st.radio(
-        "Select Section to Explore:",
-        options=["Player Demographics", "Game Behavior KPIs"]
-    )
+# Sidebar for section selection
+st.sidebar.title("📂 Select Analysis Section")
+section = st.sidebar.radio(
+    "Go to",
+    ("Player Demographics", "Game Behavior Metrics")
+)
 
 # Main Title
-st.title("🎯 Player Engagement Dashboard")
-st.markdown("Gain insights into player behavior, engagement, and game preferences.")
+st.title("🎮 Online Gaming Behavior Dashboard")
+st.markdown("Analyze player engagement, demographics, and gaming behavior.")
 
 st.markdown("---")
 
-### Section 1: Player Demographics
+# Section 1: Player Demographics
 if section == "Player Demographics":
-    st.header("📊 **Player Demographics**")
+    st.header("👥 Player Demographics")
 
     # KPIs
     st.subheader("🔹 Key Metrics")
-    col1, col2, col3, col4, col5, col6 = st.columns(6)
+    col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
         st.metric("Total Players", data['PlayerID'].nunique())
     with col2:
         st.metric("Avg Playtime (hrs)", f"{data['PlayTimeHours'].mean():.2f}")
     with col3:
-        st.metric("Avg Sessions/Week", f"{data['SessionsPerWeek'].mean():.1f}")
+        st.metric("Total Avg Sessions/Week", f"{data['SessionsPerWeek'].mean():.1f}")
     with col4:
-        st.metric("Avg Age", f"{data['Age'].mean():.1f}")
+        st.metric("Average Age", f"{data['Age'].mean():.1f}")
     with col5:
-        st.metric("Age Range", f"{data['Age'].min()} - {data['Age'].max()}")
-    with col6:
-        st.metric("Avg Player Level", f"{data['PlayerLevel'].mean():.1f}")
-
-    # Visualizations
-    st.subheader("📊 Visual Analysis")
-
-    # 1. Percentage of Players by Gender
-    st.markdown("#### Percentage of Players by Gender")
-    gender_counts = data["Gender"].value_counts().reset_index()
-    gender_counts.columns = ['Gender', 'Count']
-    gender_counts['Percentage'] = (gender_counts['Count'] / gender_counts['Count'].sum()) * 100
-
-    gender_fig = px.pie(
-        gender_counts, 
-        names='Gender', 
-        values='Percentage', 
-        title="Percentage of Players by Gender"
-    )
-    st.plotly_chart(gender_fig, use_container_width=True)
-
-    # 2. Count of Players by Location
-    st.markdown("#### Count of Players by Location")
-    location_counts = data["Location"].value_counts().reset_index()
-    location_counts.columns = ['Location', 'Count']
-
-    location_fig = px.bar(
-        location_counts,
-        x='Location',
-        y='Count',
-        color='Location',
-        title="Count of Players by Location",
-        text='Count'
-    )
-    st.plotly_chart(location_fig, use_container_width=True)
-
-    # 3. Count of Players by Engagement Level
-    st.markdown("#### Count of Players by Engagement Level")
-    engagement_counts = data["EngagementLevel"].value_counts().reset_index()
-    engagement_counts.columns = ['EngagementLevel', 'Count']
-
-    engagement_fig = px.bar(
-        engagement_counts,
-        x='EngagementLevel',
-        y='Count',
-        color='EngagementLevel',
-        title="Count of Players by Engagement Level",
-        text='Count'
-    )
-    st.plotly_chart(engagement_fig, use_container_width=True)
-
-    # 4. Count of Players by Game Difficulty Level
-    st.markdown("#### Count of Players by Game Difficulty Level")
-    difficulty_counts = data["GameDifficulty"].value_counts().reset_index()
-    difficulty_counts.columns = ['GameDifficulty', 'Count']
-
-    difficulty_fig = px.bar(
-        difficulty_counts,
-        x='GameDifficulty',
-        y='Count',
-        color='GameDifficulty',
-        title="Count of Players by Game Difficulty Level",
-        text='Count'
-    )
-    st.plotly_chart(difficulty_fig, use_container_width=True)
+        st.metric("Age Range", f"{data['Age'].min()} - {data['Age'].max()} yrs")
 
     st.markdown("---")
 
-### Section 2: Game Behavior KPIs
-if section == "Game Behavior KPIs":
-    st.header("📊 **Game Behavior KPIs**")
-
-    # KPIs
-    st.subheader("🔹 Key Metrics")
-    col1, col2, col3, col4, col5, col6 = st.columns(6)
-    with col1:
-        st.metric("Avg Achievements per Player", f"{data['AchievementsUnlocked'].mean():.2f}")
-    with col2:
-        st.metric("Avg Playtime per Genre (hrs)", f"{data.groupby('GameGenre')['PlayTimeHours'].mean().mean():.2f}")
-    with col3:
-        st.metric("Avg Sessions per Player", f"{data['SessionsPerWeek'].mean():.2f}")
-    with col4:
-        st.metric("Avg Session Duration (mins)", f"{data['AvgSessionDurationMinutes'].mean():.1f}")
-    with col5:
-        st.metric("Percentage of Players Unlocking Achievements", f"{(data['AchievementsUnlocked'] > 0).mean() * 100:.1f}%")
-    with col6:
-        st.metric("Avg Player Level", f"{data['PlayerLevel'].mean():.1f}")
-
-    # Visualizations
-    st.subheader("📊 Visual Analysis")
-
-    # 1. Average Playtime Hours by Game Genre
-    st.markdown("#### Average Playtime Hours by Game Genre")
-    playtime_by_genre = data.groupby('GameGenre')['PlayTimeHours'].mean().reset_index()
-
-    playtime_genre_fig = px.bar(
-        playtime_by_genre,
-        x='GameGenre',
-        y='PlayTimeHours',
-        color='GameGenre',
-        title="Average Playtime Hours by Game Genre"
+    # Visual 1: Gender Distribution (Percentage)
+    st.subheader("🔸 Percentage of Players by Gender")
+    gender_counts = data['Gender'].value_counts(normalize=True) * 100
+    gender_fig = px.pie(
+        names=gender_counts.index,
+        values=gender_counts.values,
+        title="Gender Distribution (%)",
+        hole=0.4
     )
-    st.plotly_chart(playtime_genre_fig, use_container_width=True)
+    st.plotly_chart(gender_fig, use_container_width=True)
 
-    # 2. Average Sessions/Week by Engagement Level and Age
-    st.markdown("#### Average Sessions/Week by Engagement Level and Age")
+    # Visual 2: Players by Location
+    st.subheader("🔸 Players Count by Location")
+    location_counts = data['Location'].value_counts().reset_index()
+    location_counts.columns = ['Location', 'PlayerCount']
+    location_fig = px.bar(
+        location_counts,
+        x='Location',
+        y='PlayerCount',
+        text='PlayerCount',
+        title="Players by Location",
+        color='Location'
+    )
+    location_fig.update_traces(textposition='outside')
+    location_fig.update_layout(showlegend=False)
+    st.plotly_chart(location_fig, use_container_width=True)
+
+    # Visual 3: Players by Engagement Level
+    st.subheader("🔸 Players by Engagement Level")
+    engagement_counts = data['EngagementLevel'].value_counts().reset_index()
+    engagement_counts.columns = ['EngagementLevel', 'PlayerCount']
+    engagement_fig = px.bar(
+        engagement_counts,
+        x='EngagementLevel',
+        y='PlayerCount',
+        text='PlayerCount',
+        title="Players by Engagement Level",
+        color='EngagementLevel'
+    )
+    engagement_fig.update_traces(textposition='outside')
+    engagement_fig.update_layout(showlegend=False)
+    st.plotly_chart(engagement_fig, use_container_width=True)
+
+    # Visual 4: Players by Game Difficulty
+    st.subheader("🔸 Players by Game Difficulty Level")
+    difficulty_counts = data['GameDifficulty'].value_counts().reset_index()
+    difficulty_counts.columns = ['GameDifficulty', 'PlayerCount']
+    difficulty_fig = px.bar(
+        difficulty_counts,
+        x='GameDifficulty',
+        y='PlayerCount',
+        text='PlayerCount',
+        title="Players by Game Difficulty Level",
+        color='GameDifficulty'
+    )
+    difficulty_fig.update_traces(textposition='outside')
+    difficulty_fig.update_layout(showlegend=False)
+    st.plotly_chart(difficulty_fig, use_container_width=True)
+
+# Section 2: Game Behavior Metrics
+elif section == "Game Behavior Metrics":
+    st.header("🎯 Game Behavior Metrics")
+
+    # Visual 1: Average Playtime Hours by Player Level
+    st.subheader("🔸 Average Playtime Hours by Player Level")
+    playtime_by_level = data.groupby('PlayerLevel')['PlayTimeHours'].mean().reset_index()
+    playtime_level_fig = px.bar(
+        playtime_by_level,
+        x='PlayerLevel',
+        y='PlayTimeHours',
+        text='PlayTimeHours',
+        title="Avg Playtime Hours by Player Level",
+        color='PlayerLevel'
+    )
+    playtime_level_fig.update_traces(textposition='outside')
+    playtime_level_fig.update_layout(showlegend=False)
+    st.plotly_chart(playtime_level_fig, use_container_width=True)
+
+    # Visual 2: Average Sessions/Week by Engagement Level and Age (Line Plot)
+    st.subheader("🔸 Average Sessions/Week by Engagement Level and Age")
     sessions_by_engagement_age = data.groupby(['EngagementLevel', 'Age'])['SessionsPerWeek'].mean().reset_index()
-    
     sessions_engagement_age_fig = px.line(
         sessions_by_engagement_age,
         x='Age',
         y='SessionsPerWeek',
         color='EngagementLevel',
-        markers=True,  # shows points on the lines too
-        title="Average Sessions/Week by Engagement Level and Age"
+        markers=True,
+        title="Avg Sessions/Week by Engagement Level and Age"
     )
     st.plotly_chart(sessions_engagement_age_fig, use_container_width=True)
 
-
-    # 3. Achievements Unlocked by Game Genre
-    st.markdown("#### Achievements Unlocked by Game Genre")
-    achievements_by_genre = data.groupby('GameGenre')['AchievementsUnlocked'].sum().reset_index()
-
-    achievements_genre_fig = px.bar(
+    # Visual 3: Average Achievements by Game Genre
+    st.subheader("🔸 Average Achievements Unlocked by Game Genre")
+    achievements_by_genre = data.groupby('GameGenre')['AchievementsUnlocked'].mean().reset_index()
+    achievements_fig = px.bar(
         achievements_by_genre,
         x='GameGenre',
         y='AchievementsUnlocked',
-        color='GameGenre',
-        title="Achievements Unlocked by Game Genre",
-        text='AchievementsUnlocked'
+        text='AchievementsUnlocked',
+        title="Avg Achievements Unlocked by Game Genre",
+        color='GameGenre'
     )
-    st.plotly_chart(achievements_genre_fig, use_container_width=True)
+    achievements_fig.update_traces(textposition='outside')
+    achievements_fig.update_layout(showlegend=False)
+    st.plotly_chart(achievements_fig, use_container_width=True)
 
-    # 4. Average Session Duration by Difficulty Level
-    st.markdown("#### Average Session Duration by Difficulty Level")
-    session_duration_by_difficulty = data.groupby('GameDifficulty')['AvgSessionDurationMinutes'].mean().reset_index()
-
-    session_duration_diff_fig = px.bar(
-        session_duration_by_difficulty,
+    # Visual 4: Average Session Duration Minutes by Difficulty Level
+    st.subheader("🔸 Avg Session Duration Minutes by Game Difficulty Level")
+    avg_session_duration = data.groupby('GameDifficulty')['AvgSessionDurationMinutes'].mean().reset_index()
+    session_duration_fig = px.bar(
+        avg_session_duration,
         x='GameDifficulty',
         y='AvgSessionDurationMinutes',
-        color='GameDifficulty',
-        title="Average Session Duration by Difficulty Level"
+        text='AvgSessionDurationMinutes',
+        title="Avg Session Duration by Game Difficulty",
+        color='GameDifficulty'
     )
-    st.plotly_chart(session_duration_diff_fig, use_container_width=True)
+    session_duration_fig.update_traces(textposition='outside')
+    session_duration_fig.update_layout(showlegend=False)
+    st.plotly_chart(session_duration_fig, use_container_width=True)
 
-    st.markdown("---")
-
+# Footer
+st.markdown("---")
 st.caption("Built with ❤️ using Streamlit")
+
