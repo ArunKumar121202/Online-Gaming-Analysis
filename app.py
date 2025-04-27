@@ -135,21 +135,21 @@ elif section == "Game Behavior Metrics":
     )
     st.plotly_chart(sessions_engagement_age_fig, use_container_width=True)
 
-    # Visual 3: Average Achievements by Game Genre
+    # Visual 3: Average Achievements by Game Genre (Donut Chart)
     st.subheader("🔸 Average Achievements Unlocked by Game Genre")
     achievements_by_genre = data.groupby('GameGenre')['AchievementsUnlocked'].mean().reset_index()
     achievements_by_genre['AchievementsUnlocked'] = achievements_by_genre['AchievementsUnlocked'].round(2)
-    achievements_fig = px.bar(
+    
+    achievements_fig = px.pie(
         achievements_by_genre,
-        x='GameGenre',
-        y='AchievementsUnlocked',
-        text='AchievementsUnlocked',
+        names='GameGenre',
+        values='AchievementsUnlocked',
         title="Avg Achievements Unlocked by Game Genre",
-        color='GameGenre'
+        hole=0.5
     )
-    achievements_fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
-    achievements_fig.update_layout(showlegend=False)
+    achievements_fig.update_traces(textposition='inside', texttemplate='%{label}: %{value:.2f}')
     st.plotly_chart(achievements_fig, use_container_width=True)
+
 
     # Visual 4: Average Session Duration by Game Difficulty Level (Horizontal Bar)
     st.subheader("🔸 Avg Session Duration Minutes by Game Difficulty Level")
