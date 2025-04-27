@@ -148,15 +148,17 @@ if section == "Game Behavior KPIs":
     # 2. Average Sessions/Week by Engagement Level and Age
     st.markdown("#### Average Sessions/Week by Engagement Level and Age")
     sessions_by_engagement_age = data.groupby(['EngagementLevel', 'Age'])['SessionsPerWeek'].mean().reset_index()
-
-    sessions_engagement_age_fig = px.scatter(
+    
+    sessions_engagement_age_fig = px.line(
         sessions_by_engagement_age,
         x='Age',
         y='SessionsPerWeek',
         color='EngagementLevel',
+        markers=True,  # shows points on the lines too
         title="Average Sessions/Week by Engagement Level and Age"
     )
     st.plotly_chart(sessions_engagement_age_fig, use_container_width=True)
+
 
     # 3. Achievements Unlocked by Game Genre
     st.markdown("#### Achievements Unlocked by Game Genre")
