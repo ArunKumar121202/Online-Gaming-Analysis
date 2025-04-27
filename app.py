@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 st.set_page_config(page_title="Player Engagement Analysis", layout="wide")
 
 # Load the dataset
-data = pd.read_csv('player_data.csv')
+data = pd.read_csv('online_gaming_behavior_dataset.csv')
 
 # Sidebar filters
 st.sidebar.header("Filter Options")
