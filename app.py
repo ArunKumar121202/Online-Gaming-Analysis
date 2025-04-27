@@ -7,7 +7,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 
 # Page config
-st.set_page_config(page_title="Player Engagement Analysis", layout="wide")
+st.set_page_config(page_title="Online Gaming Analysis", layout="wide")
 
 # Load the dataset
 data = pd.read_csv('online_gaming_behavior_dataset.csv')
