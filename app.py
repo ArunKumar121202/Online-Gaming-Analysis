@@ -146,7 +146,6 @@ elif section == "Game Behavior Metrics":
         st.subheader("🔸 Average Achievements Unlocked by Game Genre")
         achievements_by_genre = data.groupby('GameGenre')['AchievementsUnlocked'].mean().reset_index()
         achievements_by_genre['AchievementsUnlocked'] = achievements_by_genre['AchievementsUnlocked'].round(2)
-        
         achievements_fig = px.pie(
             achievements_by_genre,
             names='GameGenre',
@@ -172,6 +171,21 @@ elif section == "Game Behavior Metrics":
         session_duration_fig.update_traces(texttemplate='%{text:.2f}', textposition='outside')
         session_duration_fig.update_layout(showlegend=False)
         st.plotly_chart(session_duration_fig, use_container_width=True)
+
+        st.subheader("🔸 Average Player Count by Player Level")
+        player_count_by_level = data['PlayerLevel'].value_counts().reset_index()
+        player_count_by_level.columns = ['PlayerLevel', 'PlayerCount']
+        player_count_fig = px.bar(
+            player_count_by_level,
+            x='PlayerLevel',
+            y='PlayerCount',
+            text='PlayerCount',
+            title="Average Player Count by Player Level",
+            color='PlayerLevel'
+        )
+        player_count_fig.update_traces(texttemplate='%{text:.0f}', textposition='outside')
+        player_count_fig.update_layout(showlegend=False)
+        st.plotly_chart(player_count_fig, use_container_width=True)
 
 # Footer
 st.markdown("---")
