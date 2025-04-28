@@ -233,30 +233,6 @@ elif section == "Engagement & Relationship Analysis":
         st.plotly_chart(px.box(data, x='EngagementLevel', y='PlayTimeHours', title="Playtime by Engagement Level"))
         st.plotly_chart(px.histogram(data, x='EngagementLevel', title="Engagement Level Distribution"))
 
-elif section == "Purchase Behavior Analysis":
-    tab1, tab2 = st.tabs(["📊 KPIs", "📈 Analysis"])
-
-    with tab1:
-        st.subheader("Key Performance Indicators")
-        purchase_rate = data['InGamePurchases'].mean() * 100
-        purchase_counts = data['InGamePurchases'].value_counts()
-
-        col1, col2 = st.columns(2)
-        col1.metric("Purchase Rate", f"{purchase_rate:.2f}%")
-        col2.metric("Total Purchasers", purchase_counts.get(1, 0))
-
-    with tab2:
-        st.subheader("Purchase Behavior Analysis")
-        purchase_counts = data['InGamePurchases'].value_counts()
-        st.plotly_chart(px.pie(
-            names=['No Purchase', 'Purchased'],
-            values=purchase_counts,
-            title="Purchase Status"
-        ))
-        st.plotly_chart(px.histogram(data[data['InGamePurchases'] == 1], x='GameGenre', title="Purchases by Game Genre"))
-        st.plotly_chart(px.histogram(data[data['InGamePurchases'] == 1], x='Location', title="Purchases by Location"))
-
-
 # Performance / Achievement Analysis Section
 elif section == "Performance / Achievement Analysis":
     tab1, tab2 = st.tabs(["📊 KPIs", "📈 Analysis"])
