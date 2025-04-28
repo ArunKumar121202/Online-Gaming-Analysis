@@ -12,7 +12,7 @@ data = pd.read_csv('online_gaming_behavior_dataset.csv')
 st.sidebar.title("📂 Select Analysis Section")
 section = st.sidebar.radio(
     "Go to",
-    ("Player Demographics", "Game Behavior Metrics")
+    ("Player Demographics", "Game Behavior Metrics", "Purchase Behavior Analysis", "Engagement & Relationship Analysis", "Performance / Achievement Analysis")
 )
 
 # Main Title
@@ -190,7 +190,8 @@ elif section == "Game Behavior Metrics":
         player_count_fig.update_traces(texttemplate='%{text:.0f}', textposition='outside')
         player_count_fig.update_layout(showlegend=False)
         st.plotly_chart(player_count_fig, use_container_width=True)
-elif page == "Purchase Behavior Analysis":
+        
+elif section == "Purchase Behavior Analysis":
     tab1, tab2 = st.tabs(["📊 KPIs", "📈 Analysis"])
 
     with tab1:
@@ -214,7 +215,7 @@ elif page == "Purchase Behavior Analysis":
         st.plotly_chart(px.histogram(data[data['InGamePurchases'] == 1], x='Location', title="Purchases by Location"))
 
 # Engagement & Relationship Analysis Section
-elif page == "Engagement & Relationship Analysis":
+elif section == "Engagement & Relationship Analysis":
     tab1, tab2 = st.tabs(["📊 KPIs", "📈 Analysis"])
 
     with tab1:
@@ -232,7 +233,7 @@ elif page == "Engagement & Relationship Analysis":
         st.plotly_chart(px.box(data, x='EngagementLevel', y='PlayTimeHours', title="Playtime by Engagement Level"))
         st.plotly_chart(px.histogram(data, x='EngagementLevel', title="Engagement Level Distribution"))
 
-elif page == "Purchase Behavior Analysis":
+elif section == "Purchase Behavior Analysis":
     tab1, tab2 = st.tabs(["📊 KPIs", "📈 Analysis"])
 
     with tab1:
@@ -257,7 +258,7 @@ elif page == "Purchase Behavior Analysis":
 
 
 # Performance / Achievement Analysis Section
-elif page == "Performance / Achievement Analysis":
+elif section == "Performance / Achievement Analysis":
     tab1, tab2 = st.tabs(["📊 KPIs", "📈 Analysis"])
 
     with tab1:
