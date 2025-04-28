@@ -113,6 +113,8 @@ elif section == "Game Behavior Metrics":
             st.metric("Avg Sessions/Week", f"{data['SessionsPerWeek'].mean():.2f}")
         with col3:
             st.metric("Avg Achievements Unlocked", f"{data['AchievementsUnlocked'].mean():.2f}")
+        with col4:
+            st.metric("Achievements Range", f"{min_achievements} - {max_achievements}")
 
     with tab2:
         st.subheader("🔸 Average Playtime Hours by Player Level")
