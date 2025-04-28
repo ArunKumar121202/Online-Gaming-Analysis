@@ -114,6 +114,8 @@ elif section == "Game Behavior Metrics":
         with col3:
             st.metric("Avg Achievements Unlocked", f"{data['AchievementsUnlocked'].mean():.2f}")
         with col4:
+            min_achievements = data['AchievementsUnlocked'].min()
+            max_achievements = data['AchievementsUnlocked'].max()
             st.metric("Achievements Range", f"{min_achievements} - {max_achievements}")
 
     with tab2:
