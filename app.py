@@ -190,7 +190,90 @@ elif section == "Game Behavior Metrics":
         player_count_fig.update_traces(texttemplate='%{text:.0f}', textposition='outside')
         player_count_fig.update_layout(showlegend=False)
         st.plotly_chart(player_count_fig, use_container_width=True)
+elif page == "Purchase Behavior Analysis":
+    tab1, tab2 = st.tabs(["📊 KPIs", "📈 Analysis"])
 
+    with tab1:
+        st.subheader("Key Performance Indicators")
+        purchase_rate = data['InGamePurchases'].mean() * 100
+        purchase_counts = data['InGamePurchases'].value_counts()
+
+        col1, col2 = st.columns(2)
+        col1.metric("Purchase Rate", f"{purchase_rate:.2f}%")
+        col2.metric("Total Purchasers", purchase_counts.get(1, 0))
+
+    with tab2:
+        st.subheader("Purchase Behavior Analysis")
+        purchase_counts = data['InGamePurchases'].value_counts()
+        st.plotly_chart(px.pie(
+            names=['No Purchase', 'Purchased'],
+            values=purchase_counts,
+            title="Purchase Status"
+        ))
+        st.plotly_chart(px.histogram(data[data['InGamePurchases'] == 1], x='GameGenre', title="Purchases by Game Genre"))
+        st.plotly_chart(px.histogram(data[data['InGamePurchases'] == 1], x='Location', title="Purchases by Location"))
+
+# Engagement & Relationship Analysis Section
+elif page == "Engagement & Relationship Analysis":
+    tab1, tab2 = st.tabs(["📊 KPIs", "📈 Analysis"])
+
+    with tab1:
+        st.subheader("Key Performance Indicators")
+        engagement_counts = data['EngagementLevel'].value_counts(normalize=True) * 100
+
+        col1, col2, col3 = st.columns(3)
+        col1.metric("High Engagement %", f"{engagement_counts.get('High', 0):.1f}%")
+        col2.metric("Medium Engagement %", f"{engagement_counts.get('Medium', 0):.1f}%")
+        col3.metric("Low Engagement %", f"{engagement_counts.get('Low', 0):.1f}%")
+
+    with tab2:
+        st.subheader("Engagement & Relationship Analysis")
+        st.plotly_chart(px.box(data, x='EngagementLevel', y='SessionsPerWeek', title="Sessions by Engagement Level"))
+        st.plotly_chart(px.box(data, x='EngagementLevel', y='PlayTimeHours', title="Playtime by Engagement Level"))
+        st.plotly_chart(px.histogram(data, x='EngagementLevel', title="Engagement Level Distribution"))
+
+elif page == "Purchase Behavior Analysis":
+    tab1, tab2 = st.tabs(["📊 KPIs", "📈 Analysis"])
+
+    with tab1:
+        st.subheader("Key Performance Indicators")
+        purchase_rate = data['InGamePurchases'].mean() * 100
+        purchase_counts = data['InGamePurchases'].value_counts()
+
+        col1, col2 = st.columns(2)
+        col1.metric("Purchase Rate", f"{purchase_rate:.2f}%")
+        col2.metric("Total Purchasers", purchase_counts.get(1, 0))
+
+    with tab2:
+        st.subheader("Purchase Behavior Analysis")
+        purchase_counts = data['InGamePurchases'].value_counts()
+        st.plotly_chart(px.pie(
+            names=['No Purchase', 'Purchased'],
+            values=purchase_counts,
+            title="Purchase Status"
+        ))
+        st.plotly_chart(px.histogram(data[data['InGamePurchases'] == 1], x='GameGenre', title="Purchases by Game Genre"))
+        st.plotly_chart(px.histogram(data[data['InGamePurchases'] == 1], x='Location', title="Purchases by Location"))
+
+
+# Performance / Achievement Analysis Section
+elif page == "Performance / Achievement Analysis":
+    tab1, tab2 = st.tabs(["📊 KPIs", "📈 Analysis"])
+
+    with tab1:
+        st.subheader("Key Performance Indicators")
+        avg_achievements = data['AchievementsUnlocked'].mean()
+        avg_player_level = data['PlayerLevel'].mean()
+
+        col1, col2 = st.columns(2)
+        col1.metric("Avg Achievements", f"{avg_achievements:.1f}")
+        col2.metric("Avg Player Level", f"{avg_player_level:.1f}")
+
+    with tab2:
+        st.subheader("Performance and Achievement Analysis")
+        st.plotly_chart(px.scatter(data, x='PlayTimeHours', y='AchievementsUnlocked', title="Achievements vs Playtime"))
+        st.plotly_chart(px.scatter(data, x='SessionsPerWeek', y='AchievementsUnlocked', title="Achievements vs Sessions"))
+        st.plotly_chart(px.histogram(data, x='PlayerLevel', title="Player Level Distribution"))
 # Footer
 st.markdown("---")
 st.caption("Built with ❤️ using Streamlit")
