@@ -5,6 +5,34 @@ import plotly.express as px
 # Page Config
 st.set_page_config(page_title="Online Gaming Analytics", layout="wide")
 
+# Dummy credentials (replace or secure appropriately)
+VALID_USERNAME = "Arun Kumar"
+VALID_PASSWORD = "Loginpage@123"
+
+# Initialize session state
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+
+# Login function
+def login():
+    st.title("🔐 Login Page")
+    st.markdown("Please enter your credentials to access the dashboard.")
+
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+
+    if st.button("Login"):
+        if username == VALID_USERNAME and password == VALID_PASSWORD:
+            st.session_state.logged_in = True
+            st.success("Login successful!")
+            st.experimental_rerun()
+        else:
+            st.error("Invalid username or password.")
+
+# Show login page if not logged in
+if not st.session_state.logged_in:
+    login()
+    st.stop()
 # Load the dataset
 data = pd.read_csv('online_gaming_behavior_dataset.csv')
 
