@@ -328,7 +328,6 @@ elif section == "Purchase Behavior Analysis":
         st.plotly_chart(fig_age_bins, use_container_width=True)
 
 
-# Engagement, Relationship & Performance Analysis Section
 elif section == "Engagement, Relationship & Performance Analysis":
     st.header("🎯 Engagement, Relationship & Performance Analysis")
 
@@ -352,6 +351,7 @@ elif section == "Engagement, Relationship & Performance Analysis":
     with tab2:
         st.subheader("🔸 Engagement & Performance Analysis")
 
+        # Boxplots: Good for understanding distribution across categories
         st.plotly_chart(
             px.box(data, x='EngagementLevel', y='SessionsPerWeek', title="Sessions per Week by Engagement Level"),
             use_container_width=True
@@ -360,20 +360,35 @@ elif section == "Engagement, Relationship & Performance Analysis":
             px.box(data, x='EngagementLevel', y='PlayTimeHours', title="Playtime Hours by Engagement Level"),
             use_container_width=True
         )
+
+        # Histogram: Still useful for seeing engagement distribution
         st.plotly_chart(
             px.histogram(data, x='EngagementLevel', title="Engagement Level Distribution"),
             use_container_width=True
         )
+
+        # Replaced dense scatter with a 2D Heatmap
         st.plotly_chart(
-            px.scatter(data, x='PlayTimeHours', y='AchievementsUnlocked', title="Achievements vs Playtime Hours"),
-            use_container_width=True
-        )
-        st.plotly_chart(
-            px.scatter(data, x='SessionsPerWeek', y='AchievementsUnlocked', title="Achievements vs Sessions per Week"),
+            px.density_heatmap(
+                data, x='PlayTimeHours', y='AchievementsUnlocked',
+                nbinsx=30, nbinsy=30,
+                color_continuous_scale='Blues',
+                title="Achievements vs Playtime Hours (Density Heatmap)"
+            ),
             use_container_width=True
         )
 
-        # Add Player Level Group Binning
+        # Modified scatter plot with opacity to reduce clutter
+        st.plotly_chart(
+            px.scatter(
+                data, x='SessionsPerWeek', y='AchievementsUnlocked',
+                opacity=0.3,
+                title="Achievements vs Sessions per Week (with Transparency)"
+            ),
+            use_container_width=True
+        )
+
+        # Binned Player Level Distribution
         bins = [0, 9, 19, 29, 39, 49, 59, 69, 79, 89, 99]
         labels = ['1-9', '10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90-99']
         data['PlayerLevelGroup'] = pd.cut(data['PlayerLevel'], bins=bins, labels=labels, right=True)
@@ -385,15 +400,15 @@ elif section == "Engagement, Relationship & Performance Analysis":
             player_level_group_counts,
             x='PlayerLevelGroup',
             y='Count',
-            text_auto=True,  # ✨ Show text automatically and nicely on top
+            text_auto=True,
             color='PlayerLevelGroup',
             title="Player Level Distribution (Binned)"
         )
 
         fig_level_group.update_traces(
-            textfont_size=12,  # ✨ Increase text size for clarity
+            textfont_size=12,
             textangle=0,
-            textposition="outside",  # ✨ Move text outside the bar
+            textposition="outside",
             cliponaxis=False
         )
 
@@ -403,10 +418,11 @@ elif section == "Engagement, Relationship & Performance Analysis":
             yaxis_title='Number of Players',
             uniformtext_minsize=10,
             uniformtext_mode='hide',
-            bargap=0.3  # ✨ Make bars slightly separated
+            bargap=0.3
         )
 
         st.plotly_chart(fig_level_group, use_container_width=True)
+
 
 # Footer
 st.markdown("---")
