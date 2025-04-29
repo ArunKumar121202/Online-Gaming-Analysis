@@ -12,7 +12,7 @@ data = pd.read_csv('online_gaming_behavior_dataset.csv')
 st.sidebar.title("📂 Select Analysis Section")
 section = st.sidebar.radio(
     "Go to",
-    ("Player Demographics", "Game Behavior Metrics", "Purchase Behavior Analysis", "Engagement & Relationship Analysis", "Performance / Achievement Analysis")
+    ("Player Demographics", "Game Behavior Metrics", "Purchase Behavior Analysis", "Engagement, Relationship & Performance Analysis")
 )
 
 # Main Title
@@ -328,43 +328,86 @@ elif section == "Purchase Behavior Analysis":
         st.plotly_chart(fig_age_bins, use_container_width=True)
 
 
-# Engagement & Relationship Analysis Section
-elif section == "Engagement & Relationship Analysis":
+# Engagement, Relationship & Performance Analysis Section
+elif section == "Engagement, Relationship & Performance Analysis":
+    st.header("🎯 Engagement, Relationship & Performance Analysis")
+
+    # Create Tabs
     tab1, tab2 = st.tabs(["📊 KPIs", "📈 Analysis"])
 
     with tab1:
-        st.subheader("Key Performance Indicators")
+        st.subheader("🔹 Engagement, Relationship & Performance KPIs")
+
         engagement_counts = data['EngagementLevel'].value_counts(normalize=True) * 100
-
-        col1, col2, col3 = st.columns(3)
-        col1.metric("High Engagement %", f"{engagement_counts.get('High', 0):.1f}%")
-        col2.metric("Medium Engagement %", f"{engagement_counts.get('Medium', 0):.1f}%")
-        col3.metric("Low Engagement %", f"{engagement_counts.get('Low', 0):.1f}%")
-
-    with tab2:
-        st.subheader("Engagement & Relationship Analysis")
-        st.plotly_chart(px.box(data, x='EngagementLevel', y='SessionsPerWeek', title="Sessions by Engagement Level"))
-        st.plotly_chart(px.box(data, x='EngagementLevel', y='PlayTimeHours', title="Playtime by Engagement Level"))
-        st.plotly_chart(px.histogram(data, x='EngagementLevel', title="Engagement Level Distribution"))
-
-# Performance / Achievement Analysis Section
-elif section == "Performance / Achievement Analysis":
-    tab1, tab2 = st.tabs(["📊 KPIs", "📈 Analysis"])
-
-    with tab1:
-        st.subheader("Key Performance Indicators")
         avg_achievements = data['AchievementsUnlocked'].mean()
         avg_player_level = data['PlayerLevel'].mean()
 
-        col1, col2 = st.columns(2)
-        col1.metric("Avg Achievements", f"{avg_achievements:.1f}")
-        col2.metric("Avg Player Level", f"{avg_player_level:.1f}")
+        col1, col2, col3, col4, col5 = st.columns(5)
+        col1.metric("High Engagement %", f"{engagement_counts.get('High', 0):.1f}%")
+        col2.metric("Medium Engagement %", f"{engagement_counts.get('Medium', 0):.1f}%")
+        col3.metric("Low Engagement %", f"{engagement_counts.get('Low', 0):.1f}%")
+        col4.metric("Avg Achievements", f"{avg_achievements:.1f}")
+        col5.metric("Avg Player Level", f"{avg_player_level:.1f}")
 
     with tab2:
-        st.subheader("Performance and Achievement Analysis")
-        st.plotly_chart(px.scatter(data, x='PlayTimeHours', y='AchievementsUnlocked', title="Achievements vs Playtime"))
-        st.plotly_chart(px.scatter(data, x='SessionsPerWeek', y='AchievementsUnlocked', title="Achievements vs Sessions"))
-        st.plotly_chart(px.histogram(data, x='PlayerLevel', title="Player Level Distribution"))
+        st.subheader("🔸 Engagement & Performance Analysis")
+
+        st.plotly_chart(
+            px.box(data, x='EngagementLevel', y='SessionsPerWeek', title="Sessions per Week by Engagement Level"),
+            use_container_width=True
+        )
+        st.plotly_chart(
+            px.box(data, x='EngagementLevel', y='PlayTimeHours', title="Playtime Hours by Engagement Level"),
+            use_container_width=True
+        )
+        st.plotly_chart(
+            px.histogram(data, x='EngagementLevel', title="Engagement Level Distribution"),
+            use_container_width=True
+        )
+        st.plotly_chart(
+            px.scatter(data, x='PlayTimeHours', y='AchievementsUnlocked', title="Achievements vs Playtime Hours"),
+            use_container_width=True
+        )
+        st.plotly_chart(
+            px.scatter(data, x='SessionsPerWeek', y='AchievementsUnlocked', title="Achievements vs Sessions per Week"),
+            use_container_width=True
+        )
+
+        # Add Player Level Group Binning
+        bins = [0, 9, 19, 29, 39, 49, 59, 69, 79, 89, 99]
+        labels = ['1-9', '10-19', '20-29', '30-39', '40-49', '50-59', '60-69', '70-79', '80-89', '90-99']
+        data['PlayerLevelGroup'] = pd.cut(data['PlayerLevel'], bins=bins, labels=labels, right=True)
+
+        player_level_group_counts = data['PlayerLevelGroup'].value_counts().sort_index().reset_index()
+        player_level_group_counts.columns = ['PlayerLevelGroup', 'Count']
+
+        fig_level_group = px.bar(
+            player_level_group_counts,
+            x='PlayerLevelGroup',
+            y='Count',
+            text_auto=True,  # ✨ Show text automatically and nicely on top
+            color='PlayerLevelGroup',
+            title="Player Level Distribution (Binned)"
+        )
+
+        fig_level_group.update_traces(
+            textfont_size=12,  # ✨ Increase text size for clarity
+            textangle=0,
+            textposition="outside",  # ✨ Move text outside the bar
+            cliponaxis=False
+        )
+
+        fig_level_group.update_layout(
+            showlegend=False,
+            xaxis_title='Player Level Group',
+            yaxis_title='Number of Players',
+            uniformtext_minsize=10,
+            uniformtext_mode='hide',
+            bargap=0.3  # ✨ Make bars slightly separated
+        )
+
+        st.plotly_chart(fig_level_group, use_container_width=True)
+
 # Footer
 st.markdown("---")
 st.caption("Built with ❤️ using Streamlit")
