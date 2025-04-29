@@ -191,28 +191,142 @@ elif section == "Game Behavior Metrics":
         player_count_fig.update_layout(showlegend=False)
         st.plotly_chart(player_count_fig, use_container_width=True)
         
+# Purchase Behavior Analysis Section
 elif section == "Purchase Behavior Analysis":
-    tab1, tab2 = st.tabs(["📊 KPIs", "📈 Analysis"])
+    st.header("💰 Purchase Behavior Analysis")
+
+    # Create Tabs
+    tab1, tab2 = st.tabs(["📊 Key KPIs", "📈 Analysis"])
 
     with tab1:
-        st.subheader("Key Performance Indicators")
-        purchase_rate = data['InGamePurchases'].mean() * 100
-        purchase_counts = data['InGamePurchases'].value_counts()
+        st.subheader("🔹 Key Performance Indicators")
 
-        col1, col2 = st.columns(2)
-        col1.metric("Purchase Rate", f"{purchase_rate:.2f}%")
-        col2.metric("Total Purchasers", purchase_counts.get(1, 0))
+        # Calculate values
+        total_players = data.shape[0]
+        purchasers = data[data['InGamePurchases'] == 1].shape[0]
+        non_purchasers = data[data['InGamePurchases'] == 0].shape[0]
+        purchase_rate = (purchasers / total_players) * 100
+        non_purchase_rate = (non_purchasers / total_players) * 100
+
+        # Purchase Rate by Gender
+        purchase_by_gender = data.groupby('Gender')['InGamePurchases'].mean() * 100
+
+        # KPI Layout
+        col1, col2, col3, col4, col5 = st.columns(5)
+        with col1:
+            st.metric("Purchasers", purchasers)
+        with col2:
+            st.metric("Non-Purchasers", non_purchasers)
+        with col3:
+            st.metric("Purchase Rate", f"{purchase_rate:.2f}%")
+        with col4:
+            st.metric("Non-Purchase Rate", f"{non_purchase_rate:.2f}%")
+        with col5:
+            male_rate = purchase_by_gender.get('Male', 0)
+            female_rate = purchase_by_gender.get('Female', 0)
+            st.metric("Male Purchase Rate", f"{male_rate:.2f}%")
+            st.metric("Female Purchase Rate", f"{female_rate:.2f}%")
 
     with tab2:
-        st.subheader("Purchase Behavior Analysis")
-        purchase_counts = data['InGamePurchases'].value_counts()
-        st.plotly_chart(px.pie(
-            names=['No Purchase', 'Purchased'],
-            values=purchase_counts,
-            title="Purchase Status"
-        ))
-        st.plotly_chart(px.histogram(data[data['InGamePurchases'] == 1], x='GameGenre', title="Purchases by Game Genre"))
-        st.plotly_chart(px.histogram(data[data['InGamePurchases'] == 1], x='Location', title="Purchases by Location"))
+        st.subheader("🔸 Purchasers vs Non-Purchasers")
+        purchase_status_counts = data['InGamePurchases'].value_counts().reset_index()
+        purchase_status_counts.columns = ['PurchaseStatus', 'Count']
+        purchase_status_counts['PurchaseStatus'] = purchase_status_counts['PurchaseStatus'].replace({1: 'Purchaser', 0: 'Non-Purchaser'})
+
+        fig_purchase_status = px.pie(
+            purchase_status_counts,
+            names='PurchaseStatus',
+            values='Count',
+            title="Purchasers vs Non-Purchasers",
+            hole=0.4
+        )
+        st.plotly_chart(fig_purchase_status, use_container_width=True)
+
+        st.subheader("🔸 Purchasers by Location")
+        purchasers_location = data[data['InGamePurchases'] == 1]['Location'].value_counts().reset_index()
+        purchasers_location.columns = ['Location', 'Purchasers']
+
+        fig_location = px.bar(
+            purchasers_location,
+            x='Location',
+            y='Purchasers',
+            color='Location',
+            text='Purchasers',
+            title="Purchasers by Location"
+        )
+        fig_location.update_traces(texttemplate='%{text}', textposition='outside')
+        fig_location.update_layout(showlegend=False)
+        st.plotly_chart(fig_location, use_container_width=True)
+
+        st.subheader("🔸 Purchasers by Game Genre")
+        purchasers_genre = data[data['InGamePurchases'] == 1]['GameGenre'].value_counts().reset_index()
+        purchasers_genre.columns = ['GameGenre', 'Purchasers']
+
+        fig_genre = px.bar(
+            purchasers_genre,
+            x='GameGenre',
+            y='Purchasers',
+            color='GameGenre',
+            text='Purchasers',
+            title="Purchasers by Game Genre"
+        )
+        fig_genre.update_traces(texttemplate='%{text}', textposition='outside')
+        fig_genre.update_layout(showlegend=False)
+        st.plotly_chart(fig_genre, use_container_width=True)
+
+        st.subheader("🔸 Purchasers by Game Difficulty Level")
+        purchasers_difficulty = data[data['InGamePurchases'] == 1]['GameDifficulty'].value_counts().reset_index()
+        purchasers_difficulty.columns = ['GameDifficulty', 'Purchasers']
+
+        fig_difficulty = px.bar(
+            purchasers_difficulty,
+            x='GameDifficulty',
+            y='Purchasers',
+            color='GameDifficulty',
+            text='Purchasers',
+            title="Purchasers by Game Difficulty"
+        )
+        fig_difficulty.update_traces(texttemplate='%{text}', textposition='outside')
+        fig_difficulty.update_layout(showlegend=False)
+        st.plotly_chart(fig_difficulty, use_container_width=True)
+
+        st.subheader("🔸 Purchasers vs Non-Purchasers by Engagement Level")
+        purchasers_engagement = data.groupby(['EngagementLevel', 'InGamePurchases']).size().reset_index(name='Count')
+        purchasers_engagement['PurchaseStatus'] = purchasers_engagement['InGamePurchases'].replace({1: 'Purchaser', 0: 'Non-Purchaser'})
+
+        fig_engagement = px.bar(
+            purchasers_engagement,
+            x='EngagementLevel',
+            y='Count',
+            color='PurchaseStatus',
+            barmode='group',
+            text='Count',
+            title="Purchasers vs Non-Purchasers by Engagement Level"
+        )
+        fig_engagement.update_traces(texttemplate='%{text}', textposition='outside')
+        st.plotly_chart(fig_engagement, use_container_width=True)
+
+        st.subheader("🔸 Purchasers by Age (Bins)")
+        # Purchasers by Age (Bins)
+        bins = [14, 19, 24, 29, 34, 39, 44, 49]
+        labels = ['15-19', '20-24', '25-29', '30-34', '35-39', '40-44', '45-49']
+        data['AgeGroup'] = pd.cut(data['Age'], bins=bins, labels=labels, right=True)
+        
+        purchasers_age_bins = data[data['InGamePurchases'] == 1]['AgeGroup'].value_counts().sort_index().reset_index()
+        purchasers_age_bins.columns = ['AgeGroup', 'PurchaserCount']
+        
+        fig_age_bins = px.bar(
+            purchasers_age_bins,
+            x='AgeGroup',
+            y='PurchaserCount',
+            text='PurchaserCount',
+            title="Purchasers by Age Group",
+            color='AgeGroup'
+        )
+        fig_age_bins.update_traces(texttemplate='%{text}', textposition='outside')
+        fig_age_bins.update_layout(showlegend=False)
+        st.plotly_chart(fig_age_bins, use_container_width=True)
+
 
 # Engagement & Relationship Analysis Section
 elif section == "Engagement & Relationship Analysis":
