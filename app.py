@@ -43,6 +43,9 @@ section = st.sidebar.radio(
     ("Player Demographics", "Game Behavior Metrics", "Purchase Behavior Analysis", "Engagement, Relationship & Performance Analysis")
 )
 
+if st.sidebar.button("Logout"):
+    st.session_state.logged_in = False
+    st.experimental_rerun()
 # Main Title
 st.title("🎮 Online Gaming Behavior Dashboard")
 st.markdown("Analyze player engagement, demographics, and gaming behavior.")
