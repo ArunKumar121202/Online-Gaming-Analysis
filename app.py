@@ -25,7 +25,7 @@ def login():
         if username == VALID_USERNAME and password == VALID_PASSWORD:
             st.session_state.logged_in = True
             st.success("Login successful!")
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.error("Invalid username or password.")
 
@@ -45,7 +45,7 @@ section = st.sidebar.radio(
 
 if st.sidebar.button("Logout"):
     st.session_state.logged_in = False
-    st.experimental_rerun()
+    st.rerun()
 # Main Title
 st.title("🎮 Online Gaming Behavior Dashboard")
 st.markdown("Analyze player engagement, demographics, and gaming behavior.")
